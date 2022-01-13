@@ -1,0 +1,121 @@
+Luego del diseño de la Base de Datos.
+
+1. Abrir C:\wamp64\www\master-php en la consola y escribir el siguite comando:
+    composer create-project laravel/laravel 'Nombre del proyecto' "5.6.*" --prefer-dist
+
+2. Crear Host Virtual: 
+
+    En C:\wamp64\bin\apache\apache2.4.46\conf\extra abrir el archivo httpd-vhosts
+    
+    <VirtualHost *:80>
+    ServerName proyecto-laravel.com.devel
+    ServerAlias www.proyecto-laravel.com.devel
+    DocumentRoot "c:/wamp64/www/master-php/proyecto-laravel/public"
+    <Directory "${INSTALL_DIR}/www/master-php/proyecto-laravel/public">
+        Options Indexes FollowSymLinks     
+        AllowOverride All
+        Order Deny,Allow
+        Allow from all     
+    </Directory> 
+    </VirtualHost>
+
+    En C:\Windows\System32\drivers\etc abrir el archivo hosts y agregar:
+        127.0.0.1 proyecto-laravel.com.devel
+
+    La ruta principal del proyecto sería: http://proyecto-laravel.com.devel/
+
+3. Crear codigo SQL para crear la BD necesaria para el proyecto (Archivo: database.sql)
+
+4. Conexion a la BD en el archivo .env, se modifica:
+    APP_URL=http://proyecto-laravel.com.devel/
+    DB_DATABASE=laravel_redsocial
+    DB_USERNAME=root
+    DB_PASSWORD=null
+
+5. Crear los modelos del proyecto.
+    Se crean dentro de la carpeta app
+    Comando para crear modelos: php artisan make:model Image
+                                php artisan make:model Comment
+                                php artisan make:model Like
+
+6. Configurar entidades y relaciones.
+
+7. Login y registro
+    Crear los Auth 
+    php artisan make:auth
+
+    Modificar redirecciones en registerController y loginController y en Middleware/redirectifaut...
+    Agregar campos necesarios al modelo de User y en el registerController agregarlos al validate y al create
+
+-----Las variables traducibles (__('Name')) estan en resources/lang/en
+
+8. Añadir elementos del menú
+
+9. Crear los controladores (php artisan make:controller 'nombrecontroller')
+
+10. Añadir rutas
+
+11.(orden opcional) Editar Perfil de usuarios
+    Cargar vista desde el controlador, y añadir middleare de autenticacion, crear esta vista y agregar rutas
+    En la vista del formulario para editar: 
+        Traer los datos del perfil logeado
+            en cada input del form, en value poner -> {{Auth::user()->name}}
+                                                        {{Auth::user()->email}}.....
+    En controlador, crear metodo para capturar los datos del form, 
+    validar los datos ($validate = $this->validate($request, [
+            'name' => 'required|string|max:255',
+            'surname' => 'required|string|max:255',
+            'nick' => 'required|string|max:255|unique:users,nick,'.$id,
+            'email' => 'required|string|email|max:255|unique:users,email,'.$id,
+        ]);)     
+    y editar en BD
+    En la vista hacer el if con la session para la alerta si actualizo o no
+
+    Subir imagenes:
+        1. En el form activarle para poder subir archivos .. enctype = "multipart/form-data" 
+        2. configurar el storage y el filesystem (
+        Crear carpetas en storage/app/public 
+        En config/filesystems.php crear disk 
+        
+        'users' => [
+            'driver' => 'local',
+            'root' => storage_path('app/users'),
+            'url' => env('APP_URL').'/storage',
+            'visibility' => 'public',
+        ],
+
+        'images' => [
+            'driver' => 'local',
+            'root' => storage_path('app/images'),
+            'url' => env('APP_URL').'/storage',
+            'visibility' => 'public',
+        ],
+        )
+        3. En el controlador, importar 
+            use Illuminate\Support\Facades\Storage;
+            use Illuminate\Support\Facades\File;
+            use Illuminate\Http\Response;
+
+
+helper para las fechas
+en app crear carpeta helpers, crear phpfile formattime, crear 
+provider php artisan make:provider FormatTimeServiceProvider
+en app/Providers/formattimeserviceprovider en el metodo register escribir
+    require_once app_path() . '/Helpers/FormatTime.php';
+Entrar al directorio config/app.php y añadir el provider al array de providers:
+
+App\Providers\FormatTimeServiceProvider::class,
+Y añadir un alias de nuestro helper:
+
+'FormatTime' => App\Helpers\FormatTime::class,
+Ya podemos usar nuestro helper en cualquier parte de nuestro código, por ejemplo en una vista hariamos algo así:
+
+{{ \FormatTime::LongTimeFilter($entrada->created_at) }}
+
+
+--contolador comentarios
+
+--controlador likes
+like y dislike, crear archivo js
+
+
