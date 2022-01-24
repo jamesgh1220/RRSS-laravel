@@ -47,6 +47,43 @@
                             <span class="nickname date">{{' | '.\FormatTime::LongTimeFilter($image->created_at) }}</span>
                             <p>{{$image->description }}</p>
                         </div>
+                        @if(Auth::user() && Auth::user()->id == $image->user->id)
+                            <div class="actions">
+                                <a href="" class="btn btn-sm btn-warning">Actualizar</a>
+                                <!--<a href="{{ route('image.delete', ['id' => $image->id]) }}" class="btn btn-sm btn-danger">Borar</a>-->
+                                <!-- Button to Open the Modal -->
+                                    <button type="button" class="btn btn-sm btn-danger" data-toggle="modal" data-target="#myModal">
+                                    Eliminar
+                                    </button>
+
+                                    <!-- The Modal -->
+                                    <div class="modal" id="myModal">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+
+                                        <!-- Modal Header -->
+                                        <div class="modal-header">
+                                            <h4 class="modal-title">¿Eliminar imágen?</h4>
+                                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                        </div>
+
+                                        <!-- Modal body -->
+                                        <div class="modal-body">
+                                            Si eliminas esta imágen, no podrás volver a recuperarla.
+                                            ¿Quieres eliminarla?
+                                        </div>
+
+                                        <!-- Modal footer -->
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-primary" data-dismiss="modal">Cancelar</button>
+                                            <a href="{{ route('image.delete', ['id' => $image->id]) }}" class="btn btn-danger">Eliminar</a>
+                                        </div>
+
+                                        </div>
+                                    </div>
+                                    </div>
+                            </div>
+                        @endif
                         <div class="clearfix"></div>
                         <div class="comments">
                             <h5>Comentarios ({{count($image->comments)}})</h5>

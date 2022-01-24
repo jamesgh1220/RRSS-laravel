@@ -4,11 +4,12 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use App\Image;
-use App\User;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\File;
-
+use App\Image;
+use App\User;
+use App\Comment;
+use App\Like;
 
 class ImageController extends Controller
 {
@@ -26,7 +27,7 @@ class ImageController extends Controller
         /**Validacion */
         $validate = $this->validate($request, [
             'description' => 'required',
-            'image_path' => 'required|file|image'
+            'image_path' => 'required|file|mimes:jpeg,jpg,png'
         ]);
 
         /**Recogiendo datos */
@@ -63,5 +64,28 @@ class ImageController extends Controller
         return view ('image.detail', [
             'image' => $image
         ]);
+    }
+
+    public function delete($id) {
+        $user = \Auth::user();
+        $image = Image::find($id);
+        $comments = Comment::where('image_id', $id)->get();
+        $likes = Like::where('image_id', $id)->get();
+
+        if ($user && $image && ($image->user->id == $user->id)) {
+            /**Eliminar comentarios */
+            $image->comments()->delete();
+            /**Eliminar likes */
+            $image->likes()->delete();
+            /**Eliminar ficheros en el Storage*/
+            Storage::disk('images')->delete($image->image_path);
+            /**Eliminar imagen de BF */
+            $image->delete();
+            $message = array('message' => 'La imágen se ha borrado correctamente');
+
+        }else {
+            $message = array('message' => 'La imágen no se ha borrado');
+        }
+        return redirect()->route('home')->with($message);
     }
 }

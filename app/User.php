@@ -27,6 +27,7 @@ class User extends Authenticatable {
     ];
 
     /** Relacion One To Many */
+    /**Para mostrar todas las imagenes que tiene un usuario */
     public function images() { 
         return $this->hasMany('App\Image');
     }
