@@ -145,3 +145,8 @@ form .avatar {
     padding-left: 40px;
     padding-top: 30px;
 }
+
+.btn-search {
+    margin-left: -150px;
+    padding-left:0px;
+}
